@@ -34,18 +34,15 @@ user.statics.hashPassword = async function (password) {
     return hash;
 }
 
+
 user.statics.comparePassword = async function (email, attemptedPassword) {
     let user = await this.findOne({email});
-
     if (!user) {
         return false;
     } 
-
     let result = await bcrypt.compare(attemptedPassword, user.password);
-
     return result;
 }
-
 
 
 module.exports = model('users', user);

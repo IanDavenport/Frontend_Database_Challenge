@@ -36,28 +36,27 @@ router.post('/users/create', async(req, res) => {
     res.send('user created');
 });
 
-
+// USER LOG-IN & AUTHENTICATION BIT
 router.post('/login', async (req, res) => {
     let {email, password} = req.body;
 
     if (!await UserModel.checkExists(email)) {
         res.send('A user with this email doesn\'t exist');
+        //  Incorrect user details submitted
         return
     }
 
     if (await UserModel.comparePassword(email, password)) {
-
         req.session.userID = nanoid();
         req.session.save();
-
         res.send('You are now signed in')
-        //  user can sign in
+        //  User authenticated and signed in
         return
     }
         res.send('You have entered an incorrect password')
-        // wrong password
-
+        // User entered an incorredct password message
 });
+
 
 router.get('/protected-route', checkSignedIn, (req,res) => {
     res.send('Welcome to the Protected Page');
