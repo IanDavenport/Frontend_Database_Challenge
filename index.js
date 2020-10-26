@@ -1,13 +1,16 @@
+//  npm i express-handlebars
+//  npm i connect-mongo     <==  NEEDED FOR SESSIONS
+//  npm i express-session   <==  NEEDED FOR SESSIONS
+
 
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const hbs = require('express-handlebars');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const express = require('express');
 
-const hbs = require('express-handlebars');
 const path = require('path');
-
 
 const router = require('./routes/router');
 const app = express();
@@ -15,7 +18,7 @@ const app = express();
 
 app.engine('.hbs', hbs({
     extname: '.hbs',
-    // defaultLayout: 'layout'
+    defaultLayout: 'layout'
 }));
 
 app.set('view engine', '.hbs');
@@ -24,16 +27,16 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 
-
-
 mongoose.connect('mongodb+srv://Ian:password123abc@cluster0.rsd7t.mongodb.net/fred?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }); //  ABOVE AVOIDS GETTING DEPRACATION WARNING
 
-
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
+
+////////////  SESSIONS CODE BELOW ////////////  
 app.use(session({
     store: new MongoStore({mongooseConnection: mongoose.connection}),
     secret: 'keyboardcat',
@@ -46,12 +49,13 @@ app.use(session({
         // maxAge: 60000  //  ONE MINUTE
     }
 }));
+////////////  SESSIONS CODE ABOVE ////////////  
 
 
 app.use('/', router);
 
 app.get('/index', (req, res) => {    //location on server
-    res.render('index');            // actual page to send to client
+    res.render('index');             // actual page to send to client
 });
 
 app.get('/admin', (req, res) => {
@@ -74,43 +78,9 @@ app.get('/three', (req, res) => {
 
 
 
-
-
-
-
-
-
-
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
