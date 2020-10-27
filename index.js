@@ -13,7 +13,6 @@ const path = require('path');
 const router = require('./routes/router');
 const app = express();
 
-
 app.engine('.hbs', hbs({
     extname: '.hbs',
     defaultLayout: 'layout'
@@ -40,8 +39,6 @@ app.use(async (req, res, next) => {
     next();
 });
 
-
-////////////  SESSIONS CODE BELOW ////////////  
 app.use(session({
     store: new MongoStore({mongooseConnection: mongoose.connection}),
     secret: 'keyboardcat',
@@ -54,41 +51,13 @@ app.use(session({
         // maxAge: 60000  //  ONE MINUTE
     }
 }));
-////////////  SESSIONS CODE ABOVE ////////////  
 
-
-app.use('/', router);
-
-app.get('/index', (req, res) => {    //location on server
-    res.render('index');             // actual page to send to client
-});
-
-app.get('/signup', (req, res) => {    //location on server
-    res.render('index');             // actual page to send to client
-});
-
-app.get('/admin', (req, res) => {
-    res.render('admin');
-});
-
-
-app.get('/two', (req, res) => {
-    res.render('two');
-});
-
-app.get('/three', (req, res) => {
-    res.render('three');
-});
-
-
+app.use('/', router)
 
 
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
 });
-
-
-
 
 
 // #### EARLY CODE FOR ADDING A NEW USER ####
@@ -108,7 +77,4 @@ app.listen(3000, () => {
 //     // let allUsers = await userModel.find({Dean});  // WOULD FIND ONLY DEANS
 // }
 // getUsers();
-
-
-
 

@@ -1,17 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Document</title>
+    <link rel="stylesheet" href="/style.css">
 
 </head>
+
 <body>
-    
+
+    <ul>
+
+        {{#if loggedIn}}
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+        {{else}}
+        <a href="/profile">Profile</a>  <!--  -->
+        <a href="/login">Login</a>
+        <a href="/signup">Signup</a>
+        {{/if}}
+    </ul>
 
     {{{ body }}}
 
-
 </body>
+
 </html>

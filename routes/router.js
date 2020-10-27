@@ -8,27 +8,50 @@ const {nanoid} = require('nanoid');
 const router = Router();
 
 
+
 router.get('/', (req, res) => {
     res.render('index');
-    });
+});
+
+router.get('/signup', (req, res) => {
+    res.render('signup');
+})    
 
 router.get('/users', async(req, res) => {
     let allUsers = await UserModel.find({});
     res.send(allUsers);   // res.render
 });
  
+router.get('/login', (req,res) => {
+    res.render('login');
+});
+
+router.get('/profile', checkSignedIn, (req,res) => {
+    res.render('profile');
+});
+
+router.get('/logout', (req,res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
+
+
 
 //  USER SIGN-UP SECTION (CREATE) ==========================================
-router.post('/users/create', async(req, res) => {
-    let {name, email, age, phoneNumber, password} = req.body;
+//  router.post('/users/create', async(req, res) => {   Cannot POST /
+//  router.post('/signup', async(req, res) => {         Cannot POST /
+//  router.post('', async(req, res) => {                Missing required info
 
-    if (!name || !email || !age || !password) {
-        res.send('Missing required info');
-        return;
+router.post('/signup', async(req, res) => {
+    let {name, email, password} = req.body;
+
+    if (!name || !email || !password) {
+        res.render('signup', {err:'Missing required info'});
+        
     }
 
-    if (await UserModel.checkExists(email, phoneNumber)) {
-        res.send('A user with this email or phone number already exists');
+    if (await UserModel.checkExists(email)) {
+        res.render('signup', {err:'A user with this email already exists'});
         return;
     }
 
@@ -37,59 +60,37 @@ router.post('/users/create', async(req, res) => {
     let user = new UserModel({
         name,
         email,
-        age,
-        phoneNumber,
         password: hashedPassword
     });
 
     user.save();
     req.session.userID = nanoid();
-    res.send('user created');
+    res.redirect('/profile');
 });
-//  USER SIGN-UP SECTION (CREATE) ==========================================
+
+router.get('/login', async (req, res) => {
+    res.render('login')
+})
 
 
-
-// USER LOG-IN & AUTHENTICATION =============================
+//  ############  LOG IN  ############  
 router.post('/login', async (req, res) => {
     let {email, password} = req.body;
 
     if (!await UserModel.checkExists(email)) {
-        res.send('A user with this email doesn\'t exist');
-        //  Incorrect user details submitted
-        return
+        res.render('login', {err: 'A user with this email doesn\'t exist'});
+        return;
     }
 
     if (await UserModel.comparePassword(email, password)) {
         req.session.userID = nanoid();
         req.session.save();
-        res.send('You are now signed in')
-        //  User authenticated and signed in
-        return
+        res.redirect('profile');
+        return;
     }
-        res.send('You have entered an incorrect password')
-        // User entered an incorrect password message
-});
-// USER LOG-IN & AUTHENTICATION =============================
-
-
-
-//  THIS BIT CHECKS THAT USERS ARE SIGNED-IN SO CAN VISIT THE 'AUTH ONLY' SECTIONS
-//               V-- user profile page
-router.get('/protected-route', checkSignedIn, (req,res) => {
-    res.send('Welcome to the Protected Page');
-});
-//  THIS BIT CHECKS THAT USERS ARE SIGNED-IN SO CAN VISIT THE 'AUTH ONLY' SECTIONS
-
-
-//  USER LOG-OFF SECTION
-router.get('/logout', (req,res) => {
-    req.session.destroy();
-    res.send('Your session has ended');
+        res.render('login', {err:'You have entered an incorrect password'})
     
-})
-//  USER LOG-OFF SECTION
-
+});
 
 
 module.exports = router;
