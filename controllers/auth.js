@@ -9,12 +9,3 @@ exports.checkSignedIn = (async(req, res, next) => {
         }
 });
 
-
-// exports.adminSignedIn = (async(req, res, next) => {
-//     if(await SessionModel.checkSession(req.session.adminID)) {
-//         next();
-//     } else {
-//         res.send('Admin must log-in to access this page');
-//     }
-// });
-

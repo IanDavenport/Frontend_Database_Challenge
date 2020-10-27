@@ -1,7 +1,6 @@
-//  npm i express-handlebars
+//  npm i express-handlebars    <==  NEEDED FOR SESSIONS
 //  npm i connect-mongo     <==  NEEDED FOR SESSIONS
 //  npm i express-session   <==  NEEDED FOR SESSIONS
-
 
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -9,9 +8,8 @@ const hbs = require('express-handlebars');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const express = require('express');
-
+const SessionModel = require('./models/sessionModel');
 const path = require('path');
-
 const router = require('./routes/router');
 const app = express();
 
@@ -36,6 +34,13 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 
+app.use(async (req, res, next) => {
+    let loggedIn = await SessionModel.checkSession(req.session).userID;
+    res.locals.loggedIn = loggedIn;
+    next();
+});
+
+
 ////////////  SESSIONS CODE BELOW ////////////  
 app.use(session({
     store: new MongoStore({mongooseConnection: mongoose.connection}),
@@ -58,9 +63,14 @@ app.get('/index', (req, res) => {    //location on server
     res.render('index');             // actual page to send to client
 });
 
+app.get('/signup', (req, res) => {    //location on server
+    res.render('index');             // actual page to send to client
+});
+
 app.get('/admin', (req, res) => {
     res.render('admin');
 });
+
 
 app.get('/two', (req, res) => {
     res.render('two');
@@ -73,17 +83,9 @@ app.get('/three', (req, res) => {
 
 
 
-
-
-
-
-
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
 });
-
-
-
 
 
 

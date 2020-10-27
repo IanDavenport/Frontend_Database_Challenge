@@ -1,11 +1,16 @@
+//  npm i nanoid   TO INSTALL NANOID WHICH GIVES RANDOM STRING FOR USER-ID
+
 const {Router} = require('express');
 const UserModel = require('../models/userModel');
 const {checkSignedIn} = require('../controllers/auth');
-const {adminSignedIn} = require('../controllers/auth');
 
 const {nanoid} = require('nanoid');
 const router = Router();
 
+
+router.get('/', (req, res) => {
+    res.render('index');
+    });
 
 router.get('/users', async(req, res) => {
     let allUsers = await UserModel.find({});
@@ -13,12 +18,12 @@ router.get('/users', async(req, res) => {
 });
  
 
-
 //  USER SIGN-UP SECTION (CREATE) ==========================================
 router.post('/users/create', async(req, res) => {
     let {name, email, age, phoneNumber, password} = req.body;
+
     if (!name || !email || !age || !password) {
-        res.send('You missed required info');
+        res.send('Missing required info');
         return;
     }
 
@@ -38,6 +43,7 @@ router.post('/users/create', async(req, res) => {
     });
 
     user.save();
+    req.session.userID = nanoid();
     res.send('user created');
 });
 //  USER SIGN-UP SECTION (CREATE) ==========================================
@@ -76,17 +82,12 @@ router.get('/protected-route', checkSignedIn, (req,res) => {
 //  THIS BIT CHECKS THAT USERS ARE SIGNED-IN SO CAN VISIT THE 'AUTH ONLY' SECTIONS
 
 
-//  MADE ADMINISTRATOR BIT SEPERATELY
-// router.get('/admin-protected-route', adminSignedIn, (req,res) => {
-//     res.send('Welcome Administrator');
-// });
-//  MADE ADMINISTRATOR BIT SEPERATELY
-
-
-
-
 //  USER LOG-OFF SECTION
-
+router.get('/logout', (req,res) => {
+    req.session.destroy();
+    res.send('Your session has ended');
+    
+})
 //  USER LOG-OFF SECTION
 
 
